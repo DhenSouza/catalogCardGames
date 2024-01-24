@@ -22,4 +22,12 @@ public class Card {
     private Integer power;
 
     private Integer resistence;
+
+    private String type;
+
+    private String manaCost;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
+    private Game game;
 }
