@@ -27,7 +27,7 @@ public class Card {
 
     private String manaCost;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(nullable = false)
     private Game game;
 }
