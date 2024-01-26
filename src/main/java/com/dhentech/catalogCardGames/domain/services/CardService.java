@@ -2,7 +2,9 @@ package com.dhentech.catalogCardGames.domain.services;
 
 import com.dhentech.catalogCardGames.domain.exceptions.CardNotFoundException;
 import com.dhentech.catalogCardGames.domain.model.Card;
+import com.dhentech.catalogCardGames.domain.model.Game;
 import com.dhentech.catalogCardGames.domain.repositories.CardRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +13,11 @@ import java.util.List;
 @Service
 public class CardService {
 
-    public static final String CARD_NOT_FOUND = "There is no Card registry with code %d";
-
     @Autowired
     private CardRepository cardRepository;
+
+    @Autowired
+    private GameService gameService;
 
     public List<Card> cardList() {
         return cardRepository.findAll();
@@ -25,6 +28,27 @@ public class CardService {
     }
 
     public Card saveACard(Card card) {
-        return card;
+        Long idGame = card.getGame().getId();
+        Game game = gameService.findByIdGame(idGame);
+
+        card.setGame(game);
+
+        return cardRepository.save(card);
+    }
+
+
+    public Card alterACard(Card card, Long id) {
+        Card cardForLogic = this.findByIdCard(id);
+        Game gameForLogic = card.getGame();
+
+        if(gameForLogic.getId() != null){
+            gameForLogic = this.gameService.findByIdGame(card.getGame().getId());
+
+            if(gameForLogic != null){
+                card.setGame(gameForLogic);
+            }
+        }
+        BeanUtils.copyProperties(card, cardForLogic, "id");
+        return cardRepository.save(cardForLogic);
     }
 }
