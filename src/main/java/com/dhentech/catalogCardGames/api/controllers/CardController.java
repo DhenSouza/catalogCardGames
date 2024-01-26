@@ -2,6 +2,7 @@ package com.dhentech.catalogCardGames.api.controllers;
 
 import com.dhentech.catalogCardGames.domain.exceptions.BusinessException;
 import com.dhentech.catalogCardGames.domain.exceptions.CardNotFoundException;
+import com.dhentech.catalogCardGames.domain.exceptions.EntityInUseException;
 import com.dhentech.catalogCardGames.domain.model.Card;
 import com.dhentech.catalogCardGames.domain.services.CardService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,14 @@ public class CardController {
         try {
             return cardService.alterACard(card, id);
         } catch (CardNotFoundException e){
+            throw new BusinessException(e.getMessage(), e);
+        }
+    }
+    @DeleteMapping("{id}")
+    public void deleteACard(@PathVariable Long id){
+        try{
+            cardService.deleteACard(id);
+        } catch (EntityInUseException e){
             throw new BusinessException(e.getMessage(), e);
         }
     }

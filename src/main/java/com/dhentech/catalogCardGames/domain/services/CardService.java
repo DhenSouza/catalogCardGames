@@ -1,11 +1,15 @@
 package com.dhentech.catalogCardGames.domain.services;
 
+import com.dhentech.catalogCardGames.domain.exceptions.BusinessException;
 import com.dhentech.catalogCardGames.domain.exceptions.CardNotFoundException;
+import com.dhentech.catalogCardGames.domain.exceptions.EntityInUseException;
 import com.dhentech.catalogCardGames.domain.model.Card;
 import com.dhentech.catalogCardGames.domain.model.Game;
 import com.dhentech.catalogCardGames.domain.repositories.CardRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,5 +54,15 @@ public class CardService {
         }
         BeanUtils.copyProperties(card, cardForLogic, "id");
         return cardRepository.save(cardForLogic);
+    }
+
+    public void deleteACard(Long id) {
+        try{
+            cardRepository.deleteById(id);
+        } catch (EmptyResultDataAccessException e){
+            throw new CardNotFoundException(id);
+        } catch (DataIntegrityViolationException e){
+            throw new EntityInUseException(e.getMessage());
+        }
     }
 }
